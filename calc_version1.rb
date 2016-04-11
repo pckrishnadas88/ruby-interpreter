@@ -19,11 +19,10 @@ class Interpreter
 		operator      = '+'	
 		hash          = Hash.new(2)
 
-		@input.split("").each_with_index.map do |i, index|
-			puts "=======START OF TOKENS======" if index == 0
+		@input.split.join.split("").each_with_index.map do |i, index|
+			
 			if i.is_number?
-				first_operand.push(i)
-				print_token(Integer, i)
+				first_operand.push(i)				
 				sub_hash = Hash.new(2)
 				sub_hash['token_type'] = Integer
 				sub_hash['value'] = i	
@@ -68,13 +67,13 @@ class Interpreter
 				exit			
 			end 
 									
-		end
-		puts "=======END OF TOKENS======"
+		end		
 		#apply the appropriate operation on the inputs based on the operand
 		add(f, first_operand ) if '+' == operator 
 		minus(f, first_operand ) if '-' == operator 		
 		multi(f, first_operand ) if '*' == operator 		
 		divide(f, first_operand ) if '/' == operator 	
+		puts "=======TOKENS======"
 		puts hash.inspect			
 	end	
 	def print_token(type, value)
