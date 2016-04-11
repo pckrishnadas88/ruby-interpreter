@@ -1,95 +1,115 @@
 =begin
 Basic calculator Interpreter
 can add, substract, multiply , divide with any number of operands at a time
+Drawback : Lacks operator precedence
 =end
-class Interpreter 
-	Integer = 'INTEGER'
-	Plus    = 'PLUS'
-	Minus   = 'MINUS'
-	Multi   = 'MULTPLICATION'
-	Divide  = 'DIVISION'
+class Interpreter 	
 	attr_accessor :input
 	def initialize
 		@input = gets.chomp				
 	end	
-	def intepret
-		pos           = 0	
-		first_operand = []		
-		f             = []		
-		operator      = '+'	
-		hash          = Hash.new(2)
+	def intepret		
+		first_operand  = []		
+		f              = []		
+		operator       = '+'		
+		array          = Array.new		
+		lc             = 0
 
 		@input.split.join.split("").each_with_index.map do |i, index|
 			
 			if i.is_number?
-				first_operand.push(i)				
-				sub_hash = Hash.new(2)
-				sub_hash['token_type'] = Integer
-				sub_hash['value'] = i	
-				hash[index] = sub_hash			
-			elsif i.is_plus?
-				f = first_operand
-				first_operand = nil
-				first_operand = []
-				sub_hash = Hash.new(2)
-				sub_hash['token_type'] = Plus
-				sub_hash['value'] = i	
-				hash[index] = sub_hash
-			elsif i.is_minus?
+				first_operand.push(i)	
+				if index == @input.length-1						
+					array.push(first_operand.join("").to_i)					
+				end
+			elsif i.is_plus?				
 				f = first_operand
 				first_operand = nil
 				first_operand = []				
-				operator = '-'
-				sub_hash = Hash.new(2)
-				sub_hash['token_type'] = Minus
-				sub_hash['value'] = i	
-				hash[index] = sub_hash
-			elsif i.is_multi?
+				array.push(f.join("").to_i)
+				array.push("+")
+			elsif i.is_minus?			
 				f = first_operand
 				first_operand = nil
 				first_operand = []				
-				operator = '*'
-				sub_hash = Hash.new(2)
-				sub_hash['token_type'] = Multi
-				sub_hash['value'] = i	
-				hash[index] = sub_hash
-			elsif i.is_divide?
+				operator = '-'				
+				array.push(f.join("").to_i)
+				array.push("-")
+			elsif i.is_multi?				
 				f = first_operand
 				first_operand = nil
 				first_operand = []				
-				operator = '/'
-				sub_hash = Hash.new(2)
-				sub_hash['token_type'] = Divide
-				sub_hash['value'] = i	
-				hash[index] = sub_hash
+				operator = '*'				
+				array.push(f.join("").to_i)
+				array.push("*")
+			elsif i.is_divide?				
+				f = first_operand
+				first_operand = nil
+				first_operand = []				
+				operator = '/'				
+				array.push(f.join("").to_i)
+				array.push("/")
 			else
 				puts "Illegal input exiting.."
 				exit			
-			end 
+			end 			
+			
+			lc = lc+1
 									
 		end		
-		#apply the appropriate operation on the inputs based on the operand
-		add(f, first_operand ) if '+' == operator 
-		minus(f, first_operand ) if '-' == operator 		
-		multi(f, first_operand ) if '*' == operator 		
-		divide(f, first_operand ) if '/' == operator 	
-		puts "=======TOKENS======"
-		puts hash.inspect			
+		#apply the appropriate operation on the inputs based on the operand			
+		#puts "=======TOKENS======"		
+		#puts array.inspect	
+		result = 0
+		array.each_with_index.map do |x, key|
+			result = x if key == 0			
+			if x == '+'
+				if key == 0 
+					result = add(result, array[key+1])
+				else
+			 		result = add(result, array [key+1])
+			 	end
+			elsif x == '-'
+				if key == 0 
+					result = minus(result, array[key+1])
+				else
+			 		result = minus(result, array [key+1])
+			 	end
+			elsif x == '*'
+				if key == 0 
+					result = multi(result, array[key+1])
+				else
+			 		result = multi(result, array [key+1])
+			 	end	
+			elsif x == '/'
+				begin
+					if key == 0 
+						result = divide(result, array[key+1])
+					else
+				 		result = divide(result, array [key+1])
+				 	end	
+				rescue
+					puts "Zero Divsion error"
+					exit
+				end	 
+			end 
+		end
+		puts "Result is: "+result.to_s
 	end	
 	def print_token(type, value)
 		puts type + ' '+ value
 	end
 	def add(f,s)
-		puts f.join("").to_i + s.join("").to_i
+		return f.to_i + s.to_i
 	end
 	def minus(f,s)
-		puts f.join("").to_i - s.join("").to_i
+		return f.to_i - s.to_i
 	end
 	def multi(f,s)
-		puts f.join("").to_i * s.join("").to_i
+		return f.to_i * s.to_i
 	end
 	def divide(f,s)
-		puts f.join("").to_i / s.join("").to_i
+		return f.to_i / s.to_i
 	end
 end
 # Override the string class, to directly use methods like obj.is_number? rather than is_number?(obj)
